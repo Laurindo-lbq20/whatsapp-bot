@@ -4,7 +4,10 @@ const qrcode = require('qrcode-terminal');
 
 const app = express();
 const client = new Client({
-  authStrategy: new LocalAuth() // Para salvar a sessão localmente
+  authStrategy: new LocalAuth(),
+  puppeteer: {
+    args: ['--no-sandbox', '--disable-setuid-sandbox'], // Flags para evitar problemas de sandbox
+  },
 });
 
 client.on('qr', (qr) => {
@@ -23,4 +26,4 @@ client.on('message', (msg) => {
 
 client.initialize();
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+app.listen(3000, () => console.log('Server is running on port 3000'));
