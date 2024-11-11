@@ -4,39 +4,41 @@ const qrcode = require('qrcode');
 
 const app = express();
 const client = new Client({
-  authStrategy: new LocalAuth({
-    clientId: "client-one" // Altere o clientId se precisar de múltiplas sessões.
-  }),
-  puppeteer: {
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
-  },
+    authStrategy: new LocalAuth(),
+    puppeteer: {
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+    },
 });
 
-app.use(express.json());
 
+app.use(express.json()); // Middleware para permitir JSON no corpo da requisição
+
+// Variável para armazenar o QR Code
 let qrCodeData = null;
 
 // Evento de QR Code gerado
 client.on('qr', (qr) => {
-  qrcode.toDataURL(qr, (err, url) => {
-    if (err) {
-      console.error('Erro ao gerar QR Code:', err);
-    } else {
-      qrCodeData = url;
-    }
-  });
+    // Converte o QR Code em imagem base64 para exibir na página HTML
+    qrcode.toDataURL(qr, (err, url) => {
+        if (err) {
+            console.error('Erro ao gerar QR Code:', err);
+        } else {
+            qrCodeData = url; // Salva o QR Code em base64
+        }
+    });
 });
 
-// Evento de conexão estabelecida
+// Evento quando o cliente está pronto
 client.on('ready', () => {
-  console.log('WhatsApp Web is ready!');
-  qrCodeData = null; // Limpa o QR Code após a conexão
+    console.log('WhatsApp Web is ready!');
+    qrCodeData = null; // Limpa o QR Code quando está conectado
 });
 
 // Rota para visualizar o QR Code
 app.get('/connect', (req, res) => {
-  if (qrCodeData) {
-    res.send(`
+    if (qrCodeData) {
+        // Exibe a página HTML com o QR Code
+        res.send(`
       <html>
       <body>
         <h1>Conecte-se ao WhatsApp</h1>
@@ -45,8 +47,9 @@ app.get('/connect', (req, res) => {
       </body>
       </html>
     `);
-  } else {
-    res.send(`
+    } else {
+        // Exibe uma mensagem caso o QR Code não esteja disponível
+        res.send(`
       <html>
       <body>
         <h1>WhatsApp Web</h1>
@@ -54,32 +57,34 @@ app.get('/connect', (req, res) => {
       </body>
       </html>
     `);
-  }
+    }
 });
 
 // Verificar conexão com WhatsApp
 app.get('/status', (req, res) => {
-  const status = client.info ? 'Conectado' : 'Desconectado';
-  res.json({ status });
+    const status = client.info ? 'Conectado' : 'Desconectado';
+    res.json({ status });
 });
 
 // Enviar mensagem
 app.post('/send-message', async (req, res) => {
-  const { number, message } = req.body;
+    const { number, message } = req.body;
 
-  if (!number || !message) {
-    return res.status(400).json({ error: 'Número e mensagem são necessários' });
-  }
+    if (!number || !message) {
+        return res.status(400).json({ error: 'Número e mensagem são necessários' });
+    }
 
-  try {
-    await client.sendMessage(`${number}@c.us`, message);
-    res.json({ status: 'Mensagem enviada com sucesso' });
-  } catch (error) {
-    console.error('Erro ao enviar mensagem:', error);
-    res.status(500).json({ error: 'Erro ao enviar mensagem' });
-  }
+    try {
+        await client.sendMessage(`${number}@c.us`, message);
+        res.json({ status: 'Mensagem enviada com sucesso' });
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        res.status(500).json({ error: 'Erro ao enviar mensagem' });
+    }
 });
 
+// Inicializar o cliente
 client.initialize();
 
+// Servidor ouvindo na porta 3000
 app.listen(3000, () => console.log('Server is running on port 3000'));
