@@ -27,6 +27,18 @@ client.on('ready', () => {
     qrCodeData = null; // Limpa o QR code quando o cliente está conectado
 });
 
+client.on('message', (msg) => {
+    if (msg.body.toLowerCase() === 'menu') {
+        msg.reply('Olá! Como posso ajudar? Aqui estão algumas opções:\n1 - Informações\n2 - Contato\n3 - Ajuda');
+    } else if (msg.body === '1') {
+        msg.reply('Aqui estão as informações sobre nossos serviços...');
+    } else if (msg.body === '2') {
+        msg.reply('Entre em contato conosco pelo número (XX) XXXX-XXXX.');
+    } else if (msg.body === '3') {
+        msg.reply('Para obter ajuda, visite nosso site ou responda com "menu" para mais opções.');
+    }
+});
+
 // Inicializa o cliente do WhatsApp
 client.initialize();
 
