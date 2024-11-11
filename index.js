@@ -4,11 +4,21 @@ const qrcode = require('qrcode');
 
 const app = express();
 const client = new Client({
-    authStrategy: new LocalAuth(),
+    authStrategy: new LocalAuth({
+      clientId: "client-one" // Id da sessão (altere se precisar de várias sessões)
+    }),
     puppeteer: {
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      args: [
+        '--no-sandbox', 
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--disable-accelerated-2d-canvas',
+        '--disable-software-rasterizer'
+      ],
     },
-});
+  });
+  
 
 
 app.use(express.json()); // Middleware para permitir JSON no corpo da requisição
