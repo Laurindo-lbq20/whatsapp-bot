@@ -25,7 +25,7 @@ client.on('qr', async (qr) => {
 // Evento de conexão bem-sucedida
 client.on('ready', () => {
     console.log('Bot conectado e pronto para uso!');
-    client.sendMessage("+244952048385", "Testando")
+    client.sendMessage("+244952048385@c.us", "Testando");
     qrCodeData = null; // Limpa o QR code quando o cliente está conectado
 });
 
