@@ -3,6 +3,7 @@ const qrcode = require('qrcode');
 const { Client, LocalAuth } = require('whatsapp-web.js');
 
 const app = express();
+app.use(express.json());
 const port = 3000;
 
 // Inicializa o cliente do WhatsApp com armazenamento de sessão
@@ -24,6 +25,7 @@ client.on('qr', async (qr) => {
 // Evento de conexão bem-sucedida
 client.on('ready', () => {
     console.log('Bot conectado e pronto para uso!');
+    client.sendMessage("+244952048385", "Testando")
     qrCodeData = null; // Limpa o QR code quando o cliente está conectado
 });
 
