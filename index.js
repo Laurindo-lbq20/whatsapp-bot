@@ -46,6 +46,25 @@ app.get('/qr', (req, res) => {
     }
 });
 
+// Adicione esta rota ao seu código
+app.post('/send-message', async (req, res) => {
+    const { recipientId, message, isGroup } = req.body;
+
+    try {
+        // Checa se o destinatário é um grupo ou um contato individual
+        const chatId = isGroup ? `${recipientId}@g.us` : `${recipientId}@c.us`;
+
+        // Envia a mensagem para o destinatário especificado
+        await client.sendMessage(chatId, message);
+
+        res.status(200).json({ status: 'success', message: 'Mensagem enviada com sucesso!' });
+    } catch (error) {
+        console.error('Erro ao enviar mensagem:', error);
+        res.status(500).json({ status: 'error', message: 'Erro ao enviar a mensagem' });
+    }
+});
+
+
 // Inicia o servidor Express
 app.listen(port, () => {
     console.log(`Servidor Express rodando em http://localhost:${port}`);
